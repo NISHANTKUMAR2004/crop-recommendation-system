@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSmart - Smart Crop Recommendation System</title>
+
+    <!-- Icons & Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pro-theme.css">
+
+    <style>
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="navbar-content">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <span>AgroSmart</span>
+                <span class="tagline">Smart Farming Solutions</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#home"><i class="fas fa-home"></i> Home</a>
+                <a href="#features"><i class="fas fa-sparkles"></i> Features</a>
+                <a href="#recommend"><i class="fas fa-wand-magic-sparkles"></i> Recommend</a>
+                <a href="#crops"><i class="fas fa-leaf"></i> Crops</a>
+                <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="hero-content animate__animated animate__fadeInUp">
+            <div class="hero-icon animate__animated animate__pulse">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <h1>Smart Crop Recommendation System</h1>
+            <p>Harness AI-powered insights for optimal farming decisions backed by real-time climate data</p>
+            <div class="hero-buttons">
+                <a href="#recommend" class="cta-button primary">
+                    <i class="fas fa-wand-magic-sparkles"></i> Get Recommendation
+                </a>
+                <a href="#crops" class="cta-button secondary">
+                    <i class="fas fa-leaf"></i> Explore Crops
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <h2>Why Choose AgroSmart?</h2>
+            <div class="features-grid">
+                <div class="feature-card animate__animated animate__fadeInUp">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered</h3>
+                    <p>Advanced machine learning analyzes soil, climate, and weather patterns for accurate
+                        recommendations</p>
+                </div>
+                <div class="feature-card animate__animated animate__fadeInUp">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Data-Driven</h3>
+                    <p>Real-time climate data integration ensures recommendations stay current with changing conditions
+                    </p>
+                </div>
+                <div class="feature-card animate__animated animate__fadeInUp">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Risk Assessment</h3>
+                    <p>Comprehensive risk evaluation helps minimize crop failure and maximize yield potential</p>
+                </div>
+                <div class="feature-card animate__animated animate__fadeInUp">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Global Database</h3>
+                    <p>Access insights from millions of farming practices and crop performance data worldwide</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN -->
+    <div class="main-container">
+
+        <!-- FORM SECTION -->
+        <section class="recommendation-section" id="recommend">
+            <div class="container">
+                <h2 class="section-title">Get Your Personalized Crop Recommendation</h2>
+                <div class="form-wrapper">
+                    <div class="form-container">
+                        <form id="cropForm" class="input-form">
+                            <div class="form-header">
+                                <i class="fas fa-database"></i>
+                                <span>Enter Your Farm Parameters</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-layer-group"></i> Soil Type</label>
+                                <select id="soil" name="soil" required>
+                                    <option value="">Select Soil Type...</option>
+                                    <option value="Loamy">Loamy</option>
+                                    <option value="Clay">Clay</option>
+                                    <option value="Sandy">Sandy</option>
+                                    <option value="Silt">Silt</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-thermometer-half"></i> Temperature (°C)</label>
+                                    <input type="number" id="temp" name="temperature" required placeholder="e.g., 25">
+                                </div>
+
+                                <div class="form-group">
+                                    <label><i class="fas fa-droplet"></i> Humidity (%)</label>
+                                    <input type="number" id="humidity" name="humidity" required placeholder="e.g., 60">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-cloud-rain"></i> Rainfall (mm)</label>
+                                <input type="number" id="rain" name="rainfall" required placeholder="e.g., 600">
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-wand-magic-sparkles"></i> Get Recommendation
+                            </button>
+                        </form>
+
+                        <!-- RESULT UI -->
+                        <div id="result" class="result-container">
+
+                            <!-- Loading Spinner -->
+                            <div id="loading" class="hidden loading-spinner">
+                                <div class="spinner-ring"></div>
+                                <p>Analyzing your farm parameters...</p>
+                            </div>
+
+                            <!-- Result Card -->
+                            <div id="resultCard" class="result-card hidden">
+                                <div class="result-header">
+                                    <div class="result-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h3>Perfect Match Found!</h3>
+                                </div>
+
+                                <div class="result-content" id="multiResultContent">
+                                    <!-- Dynamic 4-crop grid will be injected by script.js -->
+                                </div>
+                            </div>
+
+                            <!-- Error -->
+                            <div id="errorBox" class="error-box hidden">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span id="errorMessage"></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="form-info">
+                        <div class="info-card">
+                            <h3><i class="fas fa-lightbulb"></i> Pro Tips</h3>
+                            <ul>
+                                <li>Fill accurate soil type for better results</li>
+                                <li>Use current season temperature data</li>
+                                <li>Include average annual rainfall</li>
+                                <li>Check humidity levels during peak season</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CROPS GALLERY SECTION -->
+        <section class="crops-section" id="crops">
+            <div class="container">
+                <h2 class="section-title">Our Crop Database</h2>
+                <p class="section-subtitle">Explore recommended crops across different seasons</p>
+
+                <!-- Rabi Crops -->
+                <div class="season-category">
+                    <h3><i class="fas fa-snowflake"></i> Rabi Season (Winter Crops)</h3>
+                    <div class="crops-grid">
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/peas.png"
+                                    alt="Peas" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Rabi</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Peas</h4>
+                                <p>Nutritious legume crop ideal for winter cultivation</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 5-25°C</span>
+                                    <span><i class="fas fa-droplet"></i> 400-500mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Pea" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/wheat.png"
+                                    alt="Wheat" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Rabi</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Wheat</h4>
+                                <p>Primary staple crop for winter season</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 5-25°C</span>
+                                    <span><i class="fas fa-droplet"></i> 400-600mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Wheat" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/barley.png"
+                                    alt="Barley" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Rabi</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Barley</h4>
+                                <p>Versatile cereal crop for diverse soils</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 5-24°C</span>
+                                    <span><i class="fas fa-droplet"></i> 300-500mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Barley" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop"
+                                    alt="Chickpea" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Rabi</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Chickpea</h4>
+                                <p>High-protein legume crop for nutrition</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 5-30°C</span>
+                                    <span><i class="fas fa-droplet"></i> 400-500mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Chickpea" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kharif Crops -->
+                <div class="season-category">
+                    <h3><i class="fas fa-cloud-rain"></i> Kharif Season (Monsoon Crops)</h3>
+                    <div class="crops-grid">
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop"
+                                    alt="Rice" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Kharif</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Rice</h4>
+                                <p>Primary staple crop for monsoon season</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 20-30°C</span>
+                                    <span><i class="fas fa-droplet"></i> 1200-1500mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Rice" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400&h=300&fit=crop"
+                                    alt="Cotton" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Kharif</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Cotton</h4>
+                                <p>High-value fiber crop for monsoon</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 21-30°C</span>
+                                    <span><i class="fas fa-droplet"></i> 1000-1400mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Cotton" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop"
+                                    alt="Maize" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Kharif</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Maize</h4>
+                                <p>Versatile cereal for diverse applications</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 18-27°C</span>
+                                    <span><i class="fas fa-droplet"></i> 500-750mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Maize" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/sugarcane.png"
+                                    alt="Sugarcane" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Kharif</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Sugarcane</h4>
+                                <p>Industrial crop for sugar production</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 20-30°C</span>
+                                    <span><i class="fas fa-droplet"></i> 1500-2250mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Sugarcane" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zaid Crops -->
+                <div class="season-category">
+                    <h3><i class="fas fa-sun"></i> Zaid Season (Summer Crops)</h3>
+                    <div class="crops-grid">
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/cucumber.png"
+                                    alt="Cucumber" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Zaid</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Cucumber</h4>
+                                <p>Fresh vegetable for summer markets</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 18-35°C</span>
+                                    <span><i class="fas fa-droplet"></i> 400-600mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Cucumber" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/watermelon.png"
+                                    alt="Watermelon" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Zaid</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Watermelon</h4>
+                                <p>Refreshing fruit for summer season</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 20-30°C</span>
+                                    <span><i class="fas fa-droplet"></i> 400-500mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Watermelon" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/muskmelon.png"
+                                    alt="Muskmelon" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Zaid</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Muskmelon</h4>
+                                <p>Premium fruit for summer cultivation</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 20-32°C</span>
+                                    <span><i class="fas fa-droplet"></i> 500-600mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Muskmelon" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="crop-card">
+                            <div class="crop-image-wrapper">
+                                <img src="assets/crops/okra.png"
+                                    alt="Okra" loading="lazy">
+                                <div class="crop-overlay">
+                                    <span class="crop-season">Zaid</span>
+                                </div>
+                            </div>
+                            <div class="crop-info">
+                                <h4><i class="fas fa-leaf"></i> Okra</h4>
+                                <p>Nutritious vegetable for summer</p>
+                                <div class="crop-stats">
+                                    <span><i class="fas fa-thermometer-half"></i> 25-35°C</span>
+                                    <span><i class="fas fa-droplet"></i> 500-600mm</span>
+                                </div>
+                                <div class="crop-actions">
+                                    <a href="https://en.wikipedia.org/wiki/Okra" target="_blank" class="learn-more-btn">
+                                        <i class="fas fa-external-link-alt"></i> Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS SECTION -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">45+</div>
+                        <div class="stat-label">Crops Supported</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Active Farmers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Accuracy Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3 Min</div>
+                        <div class="stat-label">Average Response</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section class="contact-section" id="contact">
+            <div class="container">
+                <h2 class="section-title">Get Support</h2>
+                <div class="contact-content">
+                    <div class="contact-card">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p>support@agrosmart.com</p>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fas fa-phone"></i>
+                        <h3>Phone</h3>
+                        <p>+91-1800-AGRO-911</p>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Location</h3>
+                        <p>Across India</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About AgroSmart</h3>
+                    <p>Empowering farmers with AI-driven crop recommendations for sustainable agriculture</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#recommend">Recommend</a></li>
+                        <li><a href="#crops">Crops</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AgroSmart. All rights reserved. | Smart Farming for Better Tomorrow</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#10b981" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#10b981", "opacity": 0.4, "width": 1 },
+                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+
+</html>
