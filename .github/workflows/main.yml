@@ -61,7 +61,7 @@ jobs:
 
     # Verify Docker Images
     - name: Verify Docker Images Built
-      run: docker images | grep -E 'backend-app|ai-service|frontend-app' || echo "Warning: Some Docker images may not have been built"
+      run: docker images | grep -E 'backend-app|ai-service|frontend-app' || echo "Warning - Some Docker images may not have been built"
 
     # Validate Docker Compose Configuration
     - name: Validate Docker Compose File
