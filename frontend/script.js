@@ -103,11 +103,27 @@ const CROP_IMAGES = {
 // Function to get image source with fallback handling
 function getCropImage(cropName) {
     const normalizedName = cropName.toLowerCase().trim();
-    let imagePath = CROP_IMAGES[normalizedName] || CROP_IMAGES["default"];
-    
-    // Return the image path - browser will handle 404 gracefully
+    const imagePath = CROP_IMAGES[normalizedName] || CROP_IMAGES["default"];
     return imagePath;
 }
+
+// Enhanced image error handler with multiple fallbacks
+window.handleImageError = function(img, cropName) {
+    console.warn(`Image failed to load for ${cropName}: ${img.src}`);
+    
+    // Try alternative paths
+    if (!img.dataset.fallbackAttempted) {
+        img.dataset.fallbackAttempted = 'true';
+        // First fallback: try with .jpg extension
+        const jpgPath = img.src.replace('.png', '.jpg');
+        if (jpgPath !== img.src) {
+            img.src = jpgPath;
+            return;
+        }
+        // Second fallback: use default rice image
+        img.src = 'assets/crops/rice.png';
+    }
+};
 
 // ✅ Show Result with Enhanced Gemini Data
 function showResult(data) {
@@ -175,7 +191,7 @@ function showResult(data) {
                         <!-- Top Header Area -->
                         <div class="crop-card-header" onclick="window.open('${learnMoreUrl}', '_blank')" style="cursor: pointer;" title="Click to view complete cultivation guide">
                             <div class="crop-image-wrapper-result">
-                                <img src="${imgSrc}" alt="${rec.crop}" loading="lazy" onerror="this.src='assets/crops/rice.png'" style="display: block;">
+                                <img src="${imgSrc}" alt="${rec.crop}" loading="lazy" onerror="window.handleImageError(this, '${rec.crop}')" style="display: block; width: 100%; height: 100%;">
                             </div>
                             <div class="crop-header-text">
                                 <h3 class="crop-title-result">${rec.crop}</h3>
@@ -403,4 +419,73 @@ document.addEventListener('DOMContentLoaded', () => {
         el.classList.add('reveal');
         observer.observe(el);
     });
+});
+
+// ========================================
+// DEMO SECTION: Show sample crop cards on page load
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    const demoContent = document.getElementById('demoContent');
+    if (!demoContent) return;
+
+    // Sample crop recommendations for demo
+    const sampleRecommendations = [
+        {
+            crop: 'Rice',
+            risk: 'Low',
+            score: 92,
+            image: getCropImage('rice')
+        },
+        {
+            crop: 'Wheat',
+            risk: 'Low',
+            score: 88,
+            image: getCropImage('wheat')
+        },
+        {
+            crop: 'Maize',
+            risk: 'Medium',
+            score: 85,
+            image: getCropImage('maize')
+        },
+        {
+            crop: 'Cotton',
+            risk: 'Medium',
+            score: 80,
+            image: getCropImage('cotton')
+        }
+    ];
+
+    // Generate demo crop cards
+    let demoHTML = '';
+    sampleRecommendations.forEach((rec, idx) => {
+        const riskColor = rec.risk === "Low" ? "#10b981" : "#f59e0b";
+        const learnMoreUrl = `https://en.wikipedia.org/wiki/${rec.crop}`;
+
+        demoHTML += `
+            <div class="crop-card-container animate__animated animate__fadeInUp" style="animation-delay: ${idx * 100}ms;">
+                <div class="crop-recommend-card">
+                    <div class="crop-card-header" onclick="window.open('${learnMoreUrl}', '_blank')" style="cursor: pointer;" title="Click to view complete cultivation guide">
+                        <div class="crop-image-wrapper-result">
+                            <img src="${rec.image}" alt="${rec.crop}" loading="lazy" onerror="window.handleImageError(this, '${rec.crop}')" style="display: block; width: 100%; height: 100%;">
+                        </div>
+                        <div class="crop-header-text">
+                            <h3 class="crop-title-result">${rec.crop}</h3>
+                            <span class="risk-badge-result" style="background: ${riskColor};">${rec.risk} Risk</span>
+                        </div>
+                    </div>
+                    <div style="padding-top: 1rem; border-top: 1px solid rgba(16, 185, 129, 0.1);">
+                        <p style="margin: 0.5rem 0; color: #666; font-size: 0.95rem;">
+                            <strong>Suitability Score:</strong> <span style="font-size: 1.3rem; color: #10b981; font-weight: 700;">${rec.score}%</span>
+                        </p>
+                        <p style="margin: 0.5rem 0; color: #888; font-size: 0.85rem;">
+                            Click on the card to view the complete cultivation guide
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    demoContent.innerHTML = demoHTML;
 });

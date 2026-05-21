@@ -360,50 +360,75 @@ h1, h2, h3, .logo {
 .crop-card-header {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1.5rem;
     border-bottom: 2px solid rgba(16, 185, 129, 0.1);
-    padding-bottom: 1.2rem;
+    padding-bottom: 1.5rem;
+    transition: all 0.3s ease;
 }
 
 .crop-image-wrapper-result {
-    width: 75px;
-    height: 75px;
-    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
     overflow: hidden;
     border: 3px solid white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.crop-image-wrapper-result:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
 }
 
 .crop-image-wrapper-result img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    padding: 8px;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+.crop-image-wrapper-result img[alt] {
+    content: attr(alt);
 }
 
 .crop-header-text {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
 }
 
 .crop-title-result {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 800;
     text-transform: capitalize;
     background: var(--gradient-1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
+    word-break: break-word;
+    line-height: 1.2;
 }
 
 .risk-badge-result {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: white;
-    padding: 4px 10px;
+    padding: 6px 14px;
     border-radius: 20px;
     width: max-content;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    letter-spacing: 0.5px;
 }
 
 /* Suitability Gauge style */
