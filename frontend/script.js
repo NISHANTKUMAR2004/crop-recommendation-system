@@ -46,16 +46,25 @@ form.addEventListener("submit", async (e) => {
             })
         });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+
+        if (!data.recommendations) {
+            throw new Error("Invalid response format from server");
+        }
 
         showResult(data);
 
     } catch (error) {
+        console.error("Error:", error);
         showError("Server not responding. Please try again later.");
     }
 });
 
-// 🖼️ Crop Images Mapping for Pro UI
+// 🖼️ Crop Images Mapping - Prioritize local images, fallback to online URLs
 const CROP_IMAGES = {
     "millet": "assets/crops/millet.png",
     "rice": "assets/crops/rice.png",
@@ -64,32 +73,43 @@ const CROP_IMAGES = {
     "pea": "assets/crops/peas.png",
     "peas": "assets/crops/peas.png",
     "chickpea": "assets/crops/chickpea.png",
-    "kidneybeans": "https://images.unsplash.com/photo-1551462147-197e3714b7e8?w=800&q=80",
-    "pigeonpeas": "https://images.unsplash.com/photo-1589389502931-df1f88c5efb0?w=800&q=80",
+    "kidneybeans": "assets/crops/lentil.png", // Fallback: using lentil image
+    "pigeonpeas": "assets/crops/lentil.png", // Fallback: using lentil image
     "mothbeans": "assets/crops/mothbeans.png",
-    "mungbean": "https://images.unsplash.com/photo-1533008093121-1ce668552697?w=800&q=80",
-    "blackgram": "https://images.unsplash.com/photo-1596328229871-38cb4691469e?w=800&q=80",
+    "mungbean": "assets/crops/lentil.png", // Fallback: using lentil image
+    "blackgram": "assets/crops/lentil.png", // Fallback: using lentil image
     "lentil": "assets/crops/lentil.png",
-    "pomegranate": "https://images.unsplash.com/photo-1615486511484-92e172c5be1f?w=800&q=80",
+    "pomegranate": "assets/crops/rice.png", // Fallback
     "banana": "assets/crops/banana.png",
-    "mango": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=800&q=80",
-    "grapes": "https://images.unsplash.com/photo-1596363505729-4190a9506133?w=800&q=80",
+    "mango": "assets/crops/rice.png", // Fallback
+    "grapes": "assets/crops/rice.png", // Fallback
     "sugarcane": "assets/crops/sugarcane.png",
     "cucumber": "assets/crops/cucumber.png",
     "watermelon": "assets/crops/watermelon.png",
     "muskmelon": "assets/crops/muskmelon.png",
     "okra": "assets/crops/okra.png",
-    "apple": "https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?w=800&q=80",
-    "orange": "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=800&q=80",
+    "cabbage": "assets/crops/rice.png", // Fallback
+    "apple": "assets/crops/rice.png", // Fallback
+    "orange": "assets/crops/rice.png", // Fallback
     "papaya": "assets/crops/papaya.png",
-    "coconut": "https://images.unsplash.com/photo-1526424564887-216dc75730d1?w=800&q=80",
+    "coconut": "assets/crops/rice.png", // Fallback
     "cotton": "assets/crops/cotton.png",
-    "jute": "https://images.unsplash.com/photo-1632516481717-38de87711910?w=800&q=80",
-    "coffee": "https://images.unsplash.com/photo-1550450505-893bd5760ee0?w=800&q=80",
-    "default": "https://images.unsplash.com/photo-1592982537447-6f2a6a0c6c0e?w=800&q=80"
+    "jute": "assets/crops/rice.png", // Fallback
+    "coffee": "assets/crops/rice.png", // Fallback
+    "barley": "assets/crops/barley.png",
+    "default": "assets/crops/rice.png" // Default fallback
 };
 
-// ✅ Show Result
+// Function to get image source with fallback handling
+function getCropImage(cropName) {
+    const normalizedName = cropName.toLowerCase().trim();
+    let imagePath = CROP_IMAGES[normalizedName] || CROP_IMAGES["default"];
+    
+    // Return the image path - browser will handle 404 gracefully
+    return imagePath;
+}
+
+// ✅ Show Result with Enhanced Gemini Data
 function showResult(data) {
     loading.classList.add("hidden");
     resultCard.classList.remove("hidden");
@@ -101,27 +121,204 @@ function showResult(data) {
 
     if(data.recommendations && data.recommendations.length > 0) {
         multiContent.style.display = 'grid';
-        multiContent.style.gridTemplateColumns = 'repeat(auto-fit, minmax(220px, 1fr))';
-        multiContent.style.gap = '1.5rem';
+        multiContent.style.gridTemplateColumns = 'repeat(auto-fit, minmax(280px, 1fr))';
+        multiContent.style.gap = '2rem';
         
-        data.recommendations.forEach(rec => {
+        data.recommendations.forEach((rec, idx) => {
             const cropName = rec.crop.toLowerCase();
-            const imgSrc = CROP_IMAGES[cropName] || CROP_IMAGES["default"];
+            const imgSrc = getCropImage(cropName);
             const score = rec.score || Math.floor(Math.random() * 14 + 85);
+            const riskColor = rec.risk === "Low" ? "#10b981" : rec.risk === "Medium" ? "#f59e0b" : "#ef4444";
             
+            // Format growing tips as a bulleted list
+            const tipsList = rec.growing_tips 
+                ? rec.growing_tips.split(';').map(tip => `<li><i class="fas fa-check"></i> ${tip.trim()}</li>`).join('') 
+                : '<li>Standard growing practices apply.</li>';
+
+            // Resolve NPK parts if in string form (e.g. 60:40:40)
+            const npkValues = rec.npk_ratio ? rec.npk_ratio.split(':') : ['60', '40', '40'];
+            const nVal = npkValues[0] || '60';
+            const pVal = npkValues[1] || '40';
+            const kVal = npkValues[2] || '40';
+
+            // Pests list HTML
+            let pestsHTML = '';
+            if (rec.pests_diseases && rec.pests_diseases.length > 0) {
+                rec.pests_diseases.forEach(pest => {
+                    pestsHTML += `
+                        <div class="pest-warning-card">
+                            <h5><i class="fas fa-bug"></i> ${pest.name || 'Pest'}</h5>
+                            <p><strong>Warning Symptoms:</strong> ${pest.symptoms || 'Common crop symptoms'}</p>
+                            <p class="pest-prevention"><strong>Prevention Shield:</strong> ${pest.prevention || 'Standard pest control'}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                pestsHTML = `
+                    <div class="pest-warning-card">
+                        <h5><i class="fas fa-shield-halved"></i> No Active Threats</h5>
+                        <p>No critical biological or environmental crop damage concerns reported for this climate profile.</p>
+                    </div>
+                `;
+            }
+
+            // Market Demand badge color
+            const demandColor = rec.market_demand === "High" ? "#ec4899" : rec.market_demand === "Medium" ? "#f59e0b" : "#3b82f6";
+            
+            // Learn More link
+            const learnMoreUrl = `https://en.wikipedia.org/wiki/${rec.crop}`;
+
             multiContent.innerHTML += `
-                <div class="crop-card" style="padding: 1.5rem; text-align: center; border-radius: var(--radius-lg);">
-                    <div class="crop-image-result" style="width: 140px; height: 140px; margin: 0 auto 1.5rem; border-radius: 50%; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow-soft);">
-                        <img src="${imgSrc}" alt="${rec.crop}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; margin-bottom: 0.5rem; text-transform: capitalize; background: var(--gradient-1); -webkit-background-clip: text; color: transparent;">${rec.crop}</h2>
-                    <div style="margin-bottom: 1.2rem;">
-                        <span style="font-size: 0.9rem; font-weight: 700; background: var(--gradient-2); color: white; padding: 4px 12px; border-radius: 20px;">Risk: ${rec.risk}</span>
-                    </div>
-                    <div style="text-align: left; padding: 0 10px;">
-                        <span style="font-size: 0.95rem; font-weight: 600; color: var(--accent-blue);">Suitability: ${score}%</span>
-                        <div style="height: 8px; background: rgba(59,130,246,0.2); border-radius: 4px; margin-top: 8px; overflow: hidden;">
-                            <div style="height: 100%; width: ${score}%; background: var(--gradient-1); border-radius: 4px;"></div>
+                <div class="crop-card-container animate__animated animate__fadeInUp" id="crop-card-${idx}">
+                    <!-- Card Layout -->
+                    <div class="crop-recommend-card">
+                        <!-- Top Header Area -->
+                        <div class="crop-card-header" onclick="window.open('${learnMoreUrl}', '_blank')" style="cursor: pointer;" title="Click to view complete cultivation guide">
+                            <div class="crop-image-wrapper-result">
+                                <img src="${imgSrc}" alt="${rec.crop}" loading="lazy" onerror="this.src='assets/crops/rice.png'" style="display: block;">
+                            </div>
+                            <div class="crop-header-text">
+                                <h3 class="crop-title-result">${rec.crop}</h3>
+                                <span class="risk-badge-result" style="background: ${riskColor};">${rec.risk} Risk</span>
+                            </div>
+                        </div>
+
+                        <!-- Circular/Percentage Suitability Gauge -->
+                        <div class="suitability-gauge-container">
+                            <div class="suitability-bar-row">
+                                <span class="gauge-label"><i class="fas fa-gauge-high"></i> Suitability Rating</span>
+                                <span class="gauge-value">${score}%</span>
+                            </div>
+                            <div class="suitability-track">
+                                <div class="suitability-fill" style="width: ${score}%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Quick stats capsules bar -->
+                        <div class="quick-capsules">
+                            <div class="capsule">
+                                <i class="fas fa-calendar-days"></i>
+                                <span>${rec.season || 'Annual'}</span>
+                            </div>
+                            <div class="capsule">
+                                <i class="fas fa-droplet"></i>
+                                <span>${rec.water_requirement || 'Medium'}</span>
+                            </div>
+                            <div class="capsule">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>${rec.harvest_duration || 100} Days</span>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Category Tabs Selector -->
+                        <div class="tabs-selector">
+                            <button class="tab-btn active" onclick="switchCropTab(${idx}, 'care', event)">
+                                <i class="fas fa-seedling"></i> Care
+                            </button>
+                            <button class="tab-btn" onclick="switchCropTab(${idx}, 'npk', event)">
+                                <i class="fas fa-flask"></i> NPK
+                            </button>
+                            <button class="tab-btn" onclick="switchCropTab(${idx}, 'protection', event)">
+                                <i class="fas fa-shield-virus"></i> Shield
+                            </button>
+                            <button class="tab-btn" onclick="switchCropTab(${idx}, 'roi', event)">
+                                <i class="fas fa-chart-line"></i> ROI
+                            </button>
+                        </div>
+
+                        <!-- Sub-Category Content Panes -->
+                        <div class="tabs-panes-wrapper">
+                            <!-- Care Pane -->
+                            <div class="tab-pane-content pane-care-${idx} active-pane">
+                                <div class="crop-pane-section">
+                                    <h4>🌱 Practical Growing Tips</h4>
+                                    <ul class="tips-bullet-list">
+                                        ${tipsList}
+                                    </ul>
+                                </div>
+                                <div class="crop-pane-section">
+                                    <h4>⛰️ Soil Compatibility Analysis</h4>
+                                    <p class="pane-paragraph">${rec.soil_compatibility || 'Favorable crop-to-soil parameters compatibility detected.'}</p>
+                                </div>
+                                ${rec.special_notes ? `
+                                <div class="crop-pane-section special-notes-box">
+                                    <h4>💡 Advisor Considerations</h4>
+                                    <p class="pane-paragraph">${rec.special_notes}</p>
+                                </div>` : ''}
+                            </div>
+
+                            <!-- NPK Pane -->
+                            <div class="tab-pane-content pane-npk-${idx}">
+                                <div class="crop-pane-section">
+                                    <h4>🧪 Recommended NPK Fertilization</h4>
+                                    <p class="pane-paragraph-sub">Target Nitrogen (N), Phosphorus (P), and Potassium (K) element ratio (kg per hectare):</p>
+                                    <div class="npk-visual-bars">
+                                        <div class="npk-bar-item">
+                                            <div class="npk-circle circle-n">N</div>
+                                            <div class="npk-bar-line">
+                                                <div class="npk-fill fill-n" style="width: ${Math.min(100, (parseInt(nVal) || 60) / 1.5)}%;"></div>
+                                            </div>
+                                            <span class="npk-number">${nVal}</span>
+                                        </div>
+                                        <div class="npk-bar-item">
+                                            <div class="npk-circle circle-p">P</div>
+                                            <div class="npk-bar-line">
+                                                <div class="npk-fill fill-p" style="width: ${Math.min(100, (parseInt(pVal) || 40) / 1.5)}%;"></div>
+                                            </div>
+                                            <span class="npk-number">${pVal}</span>
+                                        </div>
+                                        <div class="npk-bar-item">
+                                            <div class="npk-circle circle-k">K</div>
+                                            <div class="npk-bar-line">
+                                                <div class="npk-fill fill-k" style="width: ${Math.min(100, (parseInt(kVal) || 40) / 1.5)}%;"></div>
+                                            </div>
+                                            <span class="npk-number">${kVal}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="crop-pane-section organic-section">
+                                    <h4>🐮 Organic Matter Improvement</h4>
+                                    <p class="pane-paragraph"><i class="fas fa-hand-holding-hand"></i> ${rec.organic_matter || 'Incorporate organic manure or green compost to enrich soil biological activity.'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Protection Pane -->
+                            <div class="tab-pane-content pane-protection-${idx}">
+                                <div class="crop-pane-section">
+                                    <h4>🛡️ Biological & Chemical Shield</h4>
+                                    <div class="pests-list-wrapper">
+                                        ${pestsHTML}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ROI & Harvest Pane -->
+                            <div class="tab-pane-content pane-roi-${idx}">
+                                <div class="crop-pane-section">
+                                    <h4>📈 Economics & Market Outlook</h4>
+                                    <div class="market-demand-row">
+                                        <span class="market-label">Market Demand Level:</span>
+                                        <span class="market-badge" style="background: ${demandColor};"><i class="fas fa-fire-flame-curved"></i> ${rec.market_demand || 'Medium'}</span>
+                                    </div>
+                                    <div class="roi-potential-box">
+                                        <p class="pane-paragraph"><strong>ROI Outlook:</strong> ${rec.roi_potential || 'Steady market demand promises favorable crop commercialization rates.'}</p>
+                                    </div>
+                                </div>
+                                <div class="crop-pane-section">
+                                    <h4>🚜 Harvesting Intelligence</h4>
+                                    <p class="pane-paragraph"><strong>Harvest Window:</strong> Ready in approximately <strong>${rec.harvest_duration || 100} days</strong> from sowing.</p>
+                                    <div class="harvest-indicators-box">
+                                        <p class="pane-paragraph"><strong>Visual Markers:</strong> ${rec.harvest_indicators || 'Look for dry pods/seed husks or general dehydration.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Learn More Link -->
+                        <div class="crop-card-footer">
+                            <a href="${learnMoreUrl}" target="_blank" class="external-learn-btn">
+                                <i class="fas fa-arrow-up-right-from-square"></i> Complete Cultivation Guide
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -131,6 +328,41 @@ function showResult(data) {
         multiContent.innerHTML = '<p style="text-align:center; width:100%; font-size:1.2rem;">No recommendations found.</p>';
     }
 }
+
+// ✅ Switch tabs inside recommended crop cards (Bound globally for inline onclick execution)
+window.switchCropTab = function(cardIdx, tabName, event) {
+    if(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    const cardContainer = document.getElementById(`crop-card-${cardIdx}`);
+    if (!cardContainer) return;
+
+    // 1. Remove active state from all tab buttons inside this card
+    const selector = cardContainer.querySelector(".tabs-selector");
+    if(selector) {
+        const buttons = selector.querySelectorAll(".tab-btn");
+        buttons.forEach(btn => btn.classList.remove("active"));
+    }
+
+    // 2. Add active state to clicked button
+    if(event && event.currentTarget) {
+        event.currentTarget.classList.add("active");
+    }
+
+    // 3. Hide all tab panes inside this card
+    const panes = cardContainer.querySelectorAll(".tab-pane-content");
+    panes.forEach(pane => {
+        pane.classList.remove("active-pane");
+    });
+
+    // 4. Show the selected pane
+    const targetPane = cardContainer.querySelector(`.pane-${tabName}-${cardIdx}`);
+    if (targetPane) {
+        targetPane.classList.add("active-pane");
+    }
+};
 
 // ❌ Show Error
 function showError(message) {

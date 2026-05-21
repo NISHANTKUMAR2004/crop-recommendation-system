@@ -13,3 +13,5 @@ services:
     build: ./ai-service
     ports:
       - "5001:5001"
+    environment:
+      - GEMINI_API_KEY=AIzaSyAeZlC7A_1JYVBUsYFGpAW4qs_2PbqpVFc

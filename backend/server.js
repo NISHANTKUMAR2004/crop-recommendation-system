@@ -33,10 +33,12 @@ app.post("/recommend", async (req, res) => {
         res.json(aiResponse.data);
 
     } catch (error) {
-        console.error(error.message);
+        console.error("Error calling AI Service:", error.message);
+        console.error("Full error:", error);
 
         res.status(500).json({
-            error: "AI Service not responding"
+            error: "AI Service not responding",
+            details: error.message
         });
     }
 });
